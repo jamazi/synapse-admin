@@ -1,6 +1,13 @@
-import { AuthProvider, Options, fetchUtils } from "react-admin";
+import { AuthProvider, HttpError, Options, fetchUtils } from "react-admin";
 
 import storage from "../storage";
+
+type SynapseError = {
+  errcode: string;
+  error: string;
+}
+
+const displayError = (errcode: string, status: number, message: string) => `${errcode} (${status}): ${message}`;
 
 const authProvider: AuthProvider = {
   // called when the user attempts to log in
@@ -50,7 +57,23 @@ const authProvider: AuthProvider = {
     const decoded_base_url = window.decodeURIComponent(base_url);
     const login_api_url = decoded_base_url + "/_matrix/client/r0/login";
 
-    const { json } = await fetchUtils.fetchJson(login_api_url, options);
+    let response;
+    try {
+      response = await fetchUtils.fetchJson(login_api_url, options);
+    } catch(err) {
+      const error = err as HttpError;
+      const errorStatus = error.status;
+      const errorBody = error.body as SynapseError;
+
+      return Promise.reject(
+        new HttpError(
+            displayError(errorBody.errcode, errorStatus, errorBody.error),
+            errorStatus,
+        )
+    );
+    }
+
+    const json = response.json;
     storage.setItem("home_server", json.home_server);
     storage.setItem("user_id", json.user_id);
     storage.setItem("access_token", json.access_token);
@@ -77,10 +100,11 @@ const authProvider: AuthProvider = {
     }
   },
   // called when the API returns an error
-  checkError: ({ status }: { status: number }) => {
-    console.log("checkError " + status);
+  checkError: (err: HttpError) => {
+    const errorBody = err.body as SynapseError;
+    const status = err.status;
     if (status === 401 || status === 403) {
-      return Promise.reject();
+      return Promise.reject({message: displayError(errorBody.errcode, status, errorBody.error)});
     }
     return Promise.resolve();
   },
