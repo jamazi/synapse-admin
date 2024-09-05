@@ -1,13 +1,7 @@
-import { AuthProvider, HttpError, Options, fetchUtils } from "react-admin";
+import { AuthProvider, HttpError, Options, fetchUtils, useTranslate } from "react-admin";
 
 import storage from "../storage";
-
-type SynapseError = {
-  errcode: string;
-  error: string;
-}
-
-const displayError = (errcode: string, status: number, message: string) => `${errcode} (${status}): ${message}`;
+import { MatrixError, displayError } from "../components/error";
 
 const authProvider: AuthProvider = {
   // called when the user attempts to log in
@@ -51,6 +45,12 @@ const authProvider: AuthProvider = {
     // use the base_url from login instead of the well_known entry from the
     // server, since the admin might want to access the admin API via some
     // private address
+    if (!base_url) {
+      // there is some kind of bug with base_url being present in the form, but not submitted
+      // ref: https://github.com/etkecc/synapse-admin/issues/14
+      localStorage.removeItem("base_url")
+      throw new Error("Homeserver URL is required.");
+    }
     base_url = base_url.replace(/\/+$/g, "");
     storage.setItem("base_url", base_url);
 
@@ -63,12 +63,13 @@ const authProvider: AuthProvider = {
     } catch(err) {
       const error = err as HttpError;
       const errorStatus = error.status;
-      const errorBody = error.body as SynapseError;
+      const errorBody = error.body as MatrixError;
+      const errMsg = !!errorBody?.errcode ? displayError(errorBody.errcode, errorStatus, errorBody.error) : displayError("M_INVALID", errorStatus, error.message);
 
       return Promise.reject(
         new HttpError(
-            displayError(errorBody.errcode, errorStatus, errorBody.error),
-            errorStatus,
+          errMsg,
+          errorStatus,
         )
     );
     }
@@ -101,8 +102,9 @@ const authProvider: AuthProvider = {
   },
   // called when the API returns an error
   checkError: (err: HttpError) => {
-    const errorBody = err.body as SynapseError;
+    const errorBody = err.body as MatrixError;
     const status = err.status;
+
     if (status === 401 || status === 403) {
       return Promise.reject({message: displayError(errorBody.errcode, status, errorBody.error)});
     }
