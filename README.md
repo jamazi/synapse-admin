@@ -1,25 +1,18 @@
-[![GitHub license](https://img.shields.io/github/license/Awesome-Technologies/synapse-admin)](https://github.com/Awesome-Technologies/synapse-admin/blob/master/LICENSE)
-[![Build Status](https://api.travis-ci.com/Awesome-Technologies/synapse-admin.svg?branch=master)](https://app.travis-ci.com/github/Awesome-Technologies/synapse-admin)
-[![build-test](https://github.com/Awesome-Technologies/synapse-admin/actions/workflows/build-test.yml/badge.svg)](https://github.com/Awesome-Technologies/synapse-admin/actions/workflows/build-test.yml)
-[![gh-pages](https://github.com/Awesome-Technologies/synapse-admin/actions/workflows/edge_ghpage.yml/badge.svg)](https://awesome-technologies.github.io/synapse-admin/)
-[![docker-release](https://github.com/Awesome-Technologies/synapse-admin/actions/workflows/docker-release.yml/badge.svg)](https://hub.docker.com/r/awesometechnologies/synapse-admin)
-[![github-release](https://github.com/Awesome-Technologies/synapse-admin/actions/workflows/github-release.yml/badge.svg)](https://github.com/Awesome-Technologies/synapse-admin/releases)
-
-# Synapse admin ui
+# Synapse Admin UI [![GitHub license](https://img.shields.io/github/license/Awesome-Technologies/synapse-admin)](https://github.com/Awesome-Technologies/synapse-admin/blob/master/LICENSE)
 
 This project is built using [react-admin](https://marmelab.com/react-admin/).
 
 ## Fork differences
+
+With [Awesome-Technologies/synapse-admin](https://github.com/Awesome-Technologies/synapse-admin) as the upstream, this
+fork is intended to be a more feature-rich version of the original project. The main goal is to provide a more
+user-friendly interface for managing Synapse homeservers.
 
 ### Available via CDN
 
 On [admin.etke.cc](https://admin.etke.cc) you can find the latest version of this fork.
 
 ### Changes
-
-With [Awesome-Technologies/synapse-admin](https://github.com/Awesome-Technologies/synapse-admin) as the upstream, this
-fork is intended to be a more feature-rich version of the original project. The main goal is to provide a more
-user-friendly interface for managing Synapse homeservers.
 
 The following changes are already implemented:
 
