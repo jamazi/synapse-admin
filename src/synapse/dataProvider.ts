@@ -767,9 +767,7 @@ const baseDataProvider: SynapseDataProvider = {
       throw Error("Failed to obtain access token.");
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-    const { json } = await jsonClient(`${uploadMediaURL}?filename="${filename}"`, {
+    const { json } = await jsonClient(`${uploadMediaURL}?filename=${filename}`, {
       method: "POST",
       headers: new Headers({
         Accept: 'application/json',
@@ -779,7 +777,7 @@ const baseDataProvider: SynapseDataProvider = {
         authenticated: true,
         token: `Bearer ${loginJson.access_token}`,
       },
-      body: formData
+      body: file
     });
     return json as UploadMediaResult;
   }
