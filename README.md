@@ -37,8 +37,21 @@ The following changes are already implemented:
 * [Federation page improvements](https://github.com/Awesome-Technologies/synapse-admin/pull/583) (using theme colors)
 * [Add UI option to block deleted rooms from being rejoined](https://github.com/etkecc/synapse-admin/pull/26)
 * [Expose user avatar URL field in the UI](https://github.com/etkecc/synapse-admin/pull/27)
+* [Fix required fields check on Bulk registration CSV upload](https://github.com/etkecc/synapse-admin/pull/32)
+* [Fix requests with invalid MXIDs on Bulk registration](https://github.com/etkecc/synapse-admin/pull/33)
 
 _the list will be updated as new changes are added_
+
+### Development
+
+`just run-dev` to start the development stack (depending on your system speed, you may want to re-run this command if
+   user creation fails)
+
+After that open `http://localhost:5173` in your browser, login using the following credentials:
+
+* Login: admin
+* Password: admin
+* Homeserver URL: http://localhost:8008
 
 ## Usage
 
