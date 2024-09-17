@@ -1,6 +1,6 @@
 import { stringify } from "query-string";
 
-import { DataProvider, DeleteParams, HttpError, Identifier, Options, RaRecord, fetchUtils } from "react-admin";
+import { DataProvider, DeleteParams, HttpError, Identifier, Options, RaRecord, fetchUtils, withLifecycleCallbacks } from "react-admin";
 
 import storage from "../storage";
 import { MatrixError, displayError } from "../components/error";
@@ -9,7 +9,7 @@ import { MatrixError, displayError } from "../components/error";
 const jsonClient = async (url: string, options: Options = {}) => {
   const token = storage.getItem("access_token");
   console.log("httpClient " + url);
-  if (token != null) {
+  if (!options.user && token !== null) {
     options.user = {
       authenticated: true,
       token: `Bearer ${token}`,
@@ -29,6 +29,7 @@ const jsonClient = async (url: string, options: Options = {}) => {
 };
 
 const mxcUrlToHttp = (mxcUrl: string) => {
+  console.log("@mxcUrlToHttp", mxcUrl);
   const homeserver = storage.getItem("base_url");
   const re = /^mxc:\/\/([^/]+)\/(\w+)/;
   const ret = re.exec(mxcUrl);
@@ -225,8 +226,20 @@ export interface DeleteMediaResult {
   total: number;
 }
 
+export interface UploadMediaParams {
+  user_id: string;
+  file: File;
+  filename: string;
+  content_type: string;
+}
+
+export interface UploadMediaResult {
+  content_uri: string;
+}
+
 export interface SynapseDataProvider extends DataProvider {
   deleteMedia: (params: DeleteMediaParams) => Promise<DeleteMediaResult>;
+  uploadMedia: (params: UploadMediaParams) => Promise<UploadMediaResult>;
 }
 
 const resourceMap = {
@@ -499,7 +512,7 @@ function getSearchOrder(order: "ASC" | "DESC") {
   }
 }
 
-const dataProvider: SynapseDataProvider = {
+const baseDataProvider: SynapseDataProvider = {
   getList: async (resource, params) => {
     console.log("getList " + resource);
     const { user_id, name, guests, deactivated, locked, search_term, destination, valid } = params.filter;
@@ -741,6 +754,57 @@ const dataProvider: SynapseDataProvider = {
     const { json } = await jsonClient(endpoint_url, { method: "POST" });
     return json as DeleteMediaResult;
   },
+
+  uploadMedia: async ({ user_id, file, filename, content_type }) => {
+    const base_url = storage.getItem("base_url");
+    const loginURL = `${base_url}/_synapse/admin/v1/users/${user_id}/login`
+    const uploadMediaURL = `${base_url}/_matrix/media/v3/upload`
+    const { json: loginJson } = await jsonClient(loginURL, {
+      method: "POST",
+    });
+    console.log("loginJson", loginJson);
+    if (!loginJson.access_token) {
+      throw Error("Failed to obtain access token.");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    const { json } = await jsonClient(`${uploadMediaURL}?filename="${filename}"`, {
+      method: "POST",
+      headers: new Headers({
+        Accept: 'application/json',
+        "Content-Type": content_type
+      }) as Headers,
+      user: {
+        authenticated: true,
+        token: `Bearer ${loginJson.access_token}`,
+      },
+      body: formData
+    });
+    return json as UploadMediaResult;
+  }
 };
+
+const dataProvider = withLifecycleCallbacks(baseDataProvider, [
+  {
+    resource: "users",
+    beforeUpdate: async (params: any, dataProvider: DataProvider) => {
+      console.log("beforeUpdate " + JSON.stringify(params));
+      const avatar_file = params.data.avatar_file.rawFile;
+
+      if (avatar_file instanceof File) {
+        const reponse = await dataProvider.uploadMedia({
+          user_id: params.id,
+          file: params.data.avatar_file.rawFile,
+          filename: params.data.avatar_file.title,
+          content_type: params.data.avatar_file.rawFile.type
+        });
+        params.data.avatar_url = reponse.content_uri;
+      }
+      return params;
+    },
+  },
+]);
+
 
 export default dataProvider;
