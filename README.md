@@ -39,6 +39,7 @@ The following changes are already implemented:
 * [Expose user avatar URL field in the UI](https://github.com/etkecc/synapse-admin/pull/27)
 * [Fix required fields check on Bulk registration CSV upload](https://github.com/etkecc/synapse-admin/pull/32)
 * [Fix requests with invalid MXIDs on Bulk registration](https://github.com/etkecc/synapse-admin/pull/33)
+* [Expose user avatar URL field in the UI](https://github.com/etkecc/synapse-admin/pull/27)
 
 _the list will be updated as new changes are added_
 
