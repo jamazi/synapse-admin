@@ -1,16 +1,26 @@
 import { stringify } from "query-string";
 
-import { DataProvider, DeleteParams, HttpError, Identifier, Options, RaRecord, fetchUtils, withLifecycleCallbacks } from "react-admin";
+import {
+  DataProvider,
+  DeleteParams,
+  HttpError,
+  Identifier,
+  Options,
+  RaRecord,
+  UpdateParams,
+  fetchUtils,
+  withLifecycleCallbacks,
+} from "react-admin";
 
 import storage from "../storage";
-import { returnMXID } from "./synapse.ts"
+import { returnMXID } from "./synapse";
 import { MatrixError, displayError } from "../components/error";
 
 // Adds the access token to all requests
 const jsonClient = async (url: string, options: Options = {}) => {
   const token = storage.getItem("access_token");
   console.log("httpClient " + url);
-  if (!options.user && token !== null) {
+  if (token !== null) {
     options.user = {
       authenticated: true,
       token: `Bearer ${token}`,
@@ -23,7 +33,9 @@ const jsonClient = async (url: string, options: Options = {}) => {
     const error = err as HttpError;
     const errorStatus = error.status;
     const errorBody = error.body as MatrixError;
-    const errMsg = !!errorBody?.errcode ? displayError(errorBody.errcode, errorStatus, errorBody.error) : displayError("M_INVALID", errorStatus, error.message);
+    const errMsg = !!errorBody?.errcode
+      ? displayError(errorBody.errcode, errorStatus, errorBody.error)
+      : displayError("M_INVALID", errorStatus, error.message);
 
     return Promise.reject(new HttpError(errMsg, errorStatus, errorBody));
   }
@@ -228,7 +240,6 @@ export interface DeleteMediaResult {
 }
 
 export interface UploadMediaParams {
-  user_id: string;
   file: File;
   filename: string;
   content_type: string;
@@ -756,47 +767,39 @@ const baseDataProvider: SynapseDataProvider = {
     return json as DeleteMediaResult;
   },
 
-  uploadMedia: async ({ user_id, file, filename, content_type }) => {
+  uploadMedia: async ({ file, filename, content_type }: UploadMediaParams) => {
     const base_url = storage.getItem("base_url");
-    const loginURL = `${base_url}/_synapse/admin/v1/users/${user_id}/login`
-    const uploadMediaURL = `${base_url}/_matrix/media/v3/upload`
-    const { json: loginJson } = await jsonClient(loginURL, {
-      method: "POST",
-    });
-    console.log("loginJson", loginJson);
-    if (!loginJson.access_token) {
-      throw Error("Failed to obtain access token.");
-    }
+    const uploadMediaURL = `${base_url}/_matrix/media/v3/upload`;
 
     const { json } = await jsonClient(`${uploadMediaURL}?filename=${filename}`, {
       method: "POST",
+      body: file,
       headers: new Headers({
-        Accept: 'application/json',
-        "Content-Type": content_type
+        Accept: "application/json",
+        "Content-Type": content_type,
       }) as Headers,
-      user: {
-        authenticated: true,
-        token: `Bearer ${loginJson.access_token}`,
-      },
-      body: file
     });
     return json as UploadMediaResult;
-  }
+  },
 };
 
 const dataProvider = withLifecycleCallbacks(baseDataProvider, [
   {
     resource: "users",
-    beforeUpdate: async (params: any, dataProvider: DataProvider) => {
-      console.log("beforeUpdate " + JSON.stringify(params));
-      const avatar_file = params.data.avatar_file.rawFile;
+    beforeUpdate: async (params: UpdateParams<any>, dataProvider: DataProvider) => {
+      const avatarFile = params.data.avatar_file?.rawFile;
+      const avatarErase = params.data.avatar_erase;
 
-      if (avatar_file instanceof File) {
+      if (avatarErase) {
+        params.data.avatar_url = "";
+        return params;
+      }
+
+      if (avatarFile instanceof File) {
         const reponse = await dataProvider.uploadMedia({
-          user_id: params.id,
-          file: params.data.avatar_file.rawFile,
+          file: avatarFile,
           filename: params.data.avatar_file.title,
-          content_type: params.data.avatar_file.rawFile.type
+          content_type: params.data.avatar_file.rawFile.type,
         });
         params.data.avatar_url = reponse.content_uri;
       }
@@ -804,6 +807,5 @@ const dataProvider = withLifecycleCallbacks(baseDataProvider, [
     },
   },
 ]);
-
 
 export default dataProvider;

@@ -271,7 +271,6 @@ const UserEditToolbar = () => {
 const UserBooleanInput = props => {
   const record = useRecordContext();
   const ownUserId = localStorage.getItem("user_id");
-  const isOwnUser = false;
   let ownUserIsSelected = false;
   if (record && record.id === ownUserId) {
     ownUserIsSelected = true;
@@ -291,13 +290,14 @@ export const UserEdit = (props: EditProps) => {
     <Edit {...props} title={<UserTitle />} actions={<UserEditActions />} mutationMode="pessimistic">
       <TabbedForm toolbar={<UserEditToolbar />}>
         <FormTab label={translate("resources.users.name", { smart_count: 1 })} icon={<PersonPinIcon />}>
-          <AvatarField source="avatar_src" sortable={false} sx={{ height: "120px", width: "120px", float: "right" }} />
+          <AvatarField source="avatar_src" sortable={false} sx={{ height: "120px", width: "120px" }} />
+          <BooleanInput source="avatar_erase" label="resources.users.action.erase_avatar" />
+          <ImageInput source="avatar_file" label="resources.users.fields.avatar" accept="image/*">
+            <ImageField source="src" title="Avatar"  />
+          </ImageInput>
           <TextInput source="id" disabled />
           <TextInput source="displayname" />
           <PasswordInput source="password" autoComplete="new-password" helperText="resources.users.helper.password" />
-          <ImageInput source="avatar_file" label="Avatar" accept="image/*">
-            <ImageField source="src" title="Avatar"  />
-          </ImageInput>
           <SelectInput source="user_type" choices={choices_type} translateChoice={false} resettable />
           <BooleanInput source="admin" />
           <BooleanInput source="locked" />
