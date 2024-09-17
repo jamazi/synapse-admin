@@ -287,7 +287,7 @@ export const UserEdit = (props: EditProps) => {
   const translate = useTranslate();
 
   return (
-    <Edit {...props} title={<UserTitle />} actions={<UserEditActions />} mutationMode="pessimistic">
+    <Edit {...props} title={<UserTitle />} actions={<UserEditActions />}>
       <TabbedForm toolbar={<UserEditToolbar />}>
         <FormTab label={translate("resources.users.name", { smart_count: 1 })} icon={<PersonPinIcon />}>
           <AvatarField source="avatar_src" sortable={false} sx={{ height: "120px", width: "120px" }} />
