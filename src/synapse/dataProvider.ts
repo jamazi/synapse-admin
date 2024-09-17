@@ -42,7 +42,6 @@ const jsonClient = async (url: string, options: Options = {}) => {
 };
 
 const mxcUrlToHttp = (mxcUrl: string) => {
-  console.log("@mxcUrlToHttp", mxcUrl);
   const homeserver = storage.getItem("base_url");
   const re = /^mxc:\/\/([^/]+)\/(\w+)/;
   const ret = re.exec(mxcUrl);
