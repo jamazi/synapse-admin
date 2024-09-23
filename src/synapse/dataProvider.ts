@@ -1,5 +1,3 @@
-import queryString from "query-string";
-
 import {
   DataProvider,
   DeleteParams,
@@ -52,6 +50,10 @@ const mxcUrlToHttp = (mxcUrl: string) => {
   const serverName = ret[1];
   const mediaId = ret[2];
   return `${homeserver}/_matrix/media/r0/thumbnail/${serverName}/${mediaId}?width=24&height=24&method=scale`;
+};
+
+const filterUndefined = (obj: Record<string, any>) => {
+  return Object.fromEntries(Object.entries(obj).filter(([key, value]) => value !== undefined));
 };
 
 interface Room {
@@ -552,7 +554,7 @@ const baseDataProvider: SynapseDataProvider = {
     const res = resourceMap[resource];
 
     const endpoint_url = homeserver + res.path;
-    const url = `${endpoint_url}?${queryString.stringify(query)}`;
+    const url = `${endpoint_url}?${new URLSearchParams(filterUndefined(query)).toString()}`;
 
     const { json } = await jsonClient(url);
     return {
@@ -606,7 +608,7 @@ const baseDataProvider: SynapseDataProvider = {
     const res = resourceMap[resource];
 
     const ref = res.reference(params.id);
-    const endpoint_url = `${homeserver}${ref.endpoint}?${queryString.stringify(query)}`;
+    const endpoint_url = `${homeserver}${ref.endpoint}?${new URLSearchParams(filterUndefined(query)).toString()}`;
 
     const { json } = await jsonClient(endpoint_url);
     return {
@@ -616,6 +618,7 @@ const baseDataProvider: SynapseDataProvider = {
   },
 
   update: async (resource, params) => {
+    console.log("update params " + JSON.stringify(params));
     console.log("update " + resource);
     const homeserver = storage.getItem("base_url");
     if (!homeserver || !(resource in resourceMap)) throw Error("Homeserver not set");

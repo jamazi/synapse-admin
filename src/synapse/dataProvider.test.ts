@@ -3,6 +3,7 @@ import fetchMock from "jest-fetch-mock";
 import dataProvider from "./dataProvider";
 import storage from "../storage";
 
+
 fetchMock.enableMocks();
 
 beforeEach(() => {
