@@ -295,7 +295,6 @@ export const UserEdit = (props: EditProps) => {
           <ImageInput
             source="avatar_file"
             label="resources.users.fields.avatar"
-            // @ts-ignore
             accept={{ "image/*": [".png", ".jpg"] }}
           >
             <ImageField source="src" title="Avatar" />
