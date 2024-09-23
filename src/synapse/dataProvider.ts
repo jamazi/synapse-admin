@@ -1,4 +1,4 @@
-import { stringify } from "query-string";
+import queryString from "query-string";
 
 import {
   DataProvider,
@@ -6,7 +6,9 @@ import {
   HttpError,
   Identifier,
   Options,
+  PaginationPayload,
   RaRecord,
+  SortPayload,
   UpdateParams,
   fetchUtils,
   withLifecycleCallbacks,
@@ -527,8 +529,8 @@ const baseDataProvider: SynapseDataProvider = {
   getList: async (resource, params) => {
     console.log("getList " + resource);
     const { user_id, name, guests, deactivated, locked, search_term, destination, valid } = params.filter;
-    const { page, perPage } = params.pagination;
-    const { field, order } = params.sort;
+    const { page, perPage } = params.pagination as PaginationPayload;
+    const { field, order } = params.sort as SortPayload;
     const from = (page - 1) * perPage;
     const query = {
       from: from,
@@ -550,7 +552,7 @@ const baseDataProvider: SynapseDataProvider = {
     const res = resourceMap[resource];
 
     const endpoint_url = homeserver + res.path;
-    const url = `${endpoint_url}?${stringify(query)}`;
+    const url = `${endpoint_url}?${queryString.stringify(query)}`;
 
     const { json } = await jsonClient(url);
     return {
@@ -604,7 +606,7 @@ const baseDataProvider: SynapseDataProvider = {
     const res = resourceMap[resource];
 
     const ref = res.reference(params.id);
-    const endpoint_url = `${homeserver}${ref.endpoint}?${stringify(query)}`;
+    const endpoint_url = `${homeserver}${ref.endpoint}?${queryString.stringify(query)}`;
 
     const { json } = await jsonClient(endpoint_url);
     return {

@@ -292,7 +292,7 @@ export const UserEdit = (props: EditProps) => {
         <FormTab label={translate("resources.users.name", { smart_count: 1 })} icon={<PersonPinIcon />}>
           <AvatarField source="avatar_src" sortable={false} sx={{ height: "120px", width: "120px" }} />
           <BooleanInput source="avatar_erase" label="resources.users.action.erase_avatar" />
-          <ImageInput source="avatar_file" label="resources.users.fields.avatar" accept="image/*">
+          <ImageInput source="avatar_file" label="resources.users.fields.avatar" accept={{ 'image/*': [] }}>
             <ImageField source="src" title="Avatar"  />
           </ImageInput>
           <TextInput source="id" disabled />
