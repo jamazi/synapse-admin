@@ -618,7 +618,6 @@ const baseDataProvider: SynapseDataProvider = {
   },
 
   update: async (resource, params) => {
-    console.log("update params " + JSON.stringify(params));
     console.log("update " + resource);
     const homeserver = storage.getItem("base_url");
     if (!homeserver || !(resource in resourceMap)) throw Error("Homeserver not set");

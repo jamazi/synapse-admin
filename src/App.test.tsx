@@ -8,8 +8,5 @@ describe("App", () => {
   it("renders", async () => {
     render(<App />);
     await screen.findAllByText("Welcome to Synapse-admin");
-    // await waitFor(() => {
-    //   expect(screen.getByText("Welcome to Synapse-admin")).toBeInTheDocument();
-    // }, { timeout: 5000 });
   });
 });

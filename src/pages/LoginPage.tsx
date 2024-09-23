@@ -296,6 +296,7 @@ const LoginPage = () => {
                 type="submit"
                 color="primary"
                 disabled={loading || !supportPassAuth}
+                fullWidth
               >
                 {translate("ra.auth.sign_in")}
               </Button>
@@ -304,6 +305,7 @@ const LoginPage = () => {
                 color="secondary"
                 onClick={handleSSO}
                 disabled={loading || ssoBaseUrl === ""}
+                fullWidth
               >
                 {translate("synapseadmin.auth.sso_sign_in")}
               </Button>

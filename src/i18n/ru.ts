@@ -8,8 +8,8 @@ const ru: SynapseTranslationMessages = {
     ...russianMessages.ra,
     navigation: {
       ...russianMessages.ra.navigation,
-      no_filtered_results: "Keine Ergebnisse",
-      clear_filters: "Alle Filter entfernen",
+      no_filtered_results: "Нет результатов",
+      clear_filters: "Все фильтры сбросить",
     },
   },
   synapseadmin: {
