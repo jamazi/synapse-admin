@@ -2,6 +2,8 @@ import { Identifier, fetchUtils } from "react-admin";
 
 import storage from "../storage";
 
+import { useAppContext } from "../AppContext.tsx";
+
 export const splitMxid = mxid => {
   const re = /^@(?<name>[a-zA-Z0-9._=\-/]+):(?<domain>[a-zA-Z0-9\-.]+\.[a-zA-Z]+)$/;
   return re.exec(mxid)?.groups;

@@ -126,37 +126,6 @@ You have three options:
 
 - browse to http://localhost:8080
 
-### Restricting available homeserver
-
-You can restrict the homeserver(s), so that the user can no longer define it himself.
-
-Edit `config.json` to restrict either to a single homeserver:
-
-```json
-{
-  "restrictBaseUrl": "https://your-matrixs-erver.example.com"
-}
-```
-
-or to a list of homeservers:
-
-```json
-{
-  "restrictBaseUrl": ["https://your-first-matrix-server.example.com", "https://your-second-matrix-server.example.com"]
-}
-```
-
-The `config.json` can be injected into a Docker container using a bind mount.
-
-```yml
-services:
-  synapse-admin:
-    ...
-    volumes:
-      ./config.json:/app/config.json:ro
-    ...
-```
-
 ### Serving Synapse-Admin on a different path
 
 The path prefix where synapse-admin is served can only be changed during the build step.
@@ -192,6 +161,54 @@ services:
       - "traefik.http.middlewares.admin.redirectregex.regex=^(.*)/admin/?"
       - "traefik.http.middlewares.admin.redirectregex.replacement=$${1}/admin/"
       - "traefik.http.middlewares.admin_path.stripprefix.prefixes=/admin"
+```
+
+## Configuration
+
+You can use `config.json` file to configure synapse-admin
+
+The `config.json` can be injected into a Docker container using a bind mount.
+
+```yml
+services:
+  synapse-admin:
+    ...
+    volumes:
+      ./config.json:/app/config.json:ro
+    ...
+```
+
+### Restricting available homeserver
+
+You can restrict the homeserver(s), so that the user can no longer define it himself.
+
+Edit `config.json` to restrict either to a single homeserver:
+
+```json
+{
+  "restrictBaseUrl": "https://your-matrixs-erver.example.com"
+}
+```
+
+or to a list of homeservers:
+
+```json
+{
+  "restrictBaseUrl": ["https://your-first-matrix-server.example.com", "https://your-second-matrix-server.example.com"]
+}
+```
+
+### Protecting appservice managed users
+
+To avoid accidental adjustments of appservice-managed users (e.g., puppets created by a bridge) and breaking the bridge,
+you can specify the list of MXIDs (regexp) that should be prohibited from any changes, except display name and avatar.
+
+Example for [mautrix-telegram](https://github.com/mautrix/telegram)
+
+```json
+{
+  "asManagedUsers": ["^@telegram_[a-zA-Z0-9]+:example\\.com$"]
+}
 ```
 
 ## Screenshots
