@@ -161,7 +161,7 @@ export const UserList = (props: ListProps) => (
     pagination={<UserPagination />}
   >
     <Datagrid rowClick={usersRowClick} bulkActionButtons={<UserBulkActionButtons />}>
-      <AvatarField type="thumbnail" source="avatar_src" sx={{ height: "40px", width: "40px" }} />
+      <AvatarField source="avatar_src" sx={{ height: "40px", width: "40px" }} />
       <TextField source="id" sortBy="name" />
       <TextField source="displayname" />
       <BooleanField source="is_guest" />
@@ -319,7 +319,7 @@ export const UserEdit = (props: EditProps) => {
     <Edit {...props} title={<UserTitle />} actions={<UserEditActions />} mutationMode="pessimistic">
       <TabbedForm toolbar={<UserEditToolbar />}>
         <FormTab label={translate("resources.users.name", { smart_count: 1 })} icon={<PersonPinIcon />}>
-          <AvatarField type="thumbnail" source="avatar_src" sx={{ height: "120px", width: "120px" }} />
+          <AvatarField source="avatar_src" sx={{ height: "120px", width: "120px" }} />
           <BooleanInput source="avatar_erase" label="resources.users.action.erase_avatar" />
           <ImageInput
             source="avatar_file"

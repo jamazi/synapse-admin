@@ -3,16 +3,16 @@ import { get } from "lodash";
 import { Avatar, AvatarProps } from "@mui/material";
 import { useRecordContext } from "react-admin";
 import { useState, useEffect } from "react";
-import { fetchAuthenticatedMedia, MediaType } from "../utils/fetchMedia";
+import { fetchAuthenticatedMedia } from "../utils/fetchMedia";
 import storage from "../storage";
 
-const AvatarField = ({ source, type, ...rest }: AvatarProps & { source: string, type: MediaType, label?: string }) => {
+const AvatarField = ({ source, ...rest }: AvatarProps & { source: string, label?: string }) => {
   const { alt, classes, sizes, sx, variant } = rest;
 
   const record = useRecordContext(rest);
   const mxcURL = get(record, source)?.toString();
 
-  const cacheKey = `${type}_${mxcURL}`;
+  const cacheKey = `thumbnail_${mxcURL}`;
   const cachedAvatar = storage.getItem(cacheKey) || "";
   const [src, setSrc] = useState<string>(cachedAvatar);
 
@@ -32,7 +32,7 @@ const AvatarField = ({ source, type, ...rest }: AvatarProps & { source: string, 
       fetchAvatar(mxcURL);
     }
 
-  }, [mxcURL, type]);
+  }, [mxcURL, cachedAvatar]);
 
   return <Avatar alt={alt} classes={classes} sizes={sizes} src={src} sx={sx} variant={variant} />;
 };

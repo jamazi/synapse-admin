@@ -143,7 +143,6 @@ export const RoomDirectoryList = () => (
       omit={["room_id", "canonical_alias", "topic"]}
     >
       <AvatarField
-        type="thumbnail"
         source="avatar_src"
         sx={{ height: "40px", width: "40px" }}
         label="resources.rooms.fields.avatar"
