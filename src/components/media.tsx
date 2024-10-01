@@ -313,13 +313,12 @@ export const QuarantineMediaButton = (props: ButtonProps) => {
 export const ViewMediaButton = ({ mxcURL, uploadName, label }) => {
   const translate = useTranslate();
   const forceDownload = (url: string, filename: string) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    console.log("a", a);
-    a.click();
-    document.body.removeChild(a);
+    const anchorElement = document.createElement("a");
+    anchorElement.href = url;
+    anchorElement.download = filename;
+    document.body.appendChild(anchorElement);
+    anchorElement.click();
+    document.body.removeChild(anchorElement);
   };
 
   const handleFile = async () => {
