@@ -29,12 +29,11 @@ import {
   useTranslate,
 } from "react-admin";
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 
 import { dateParser } from "./date";
 import { DeleteMediaParams, SynapseDataProvider } from "../synapse/dataProvider";
-import { getMediaUrl } from "../synapse/synapse";
 import storage from "../storage";
+import { fetchAuthenticatedMedia } from "../utils/fetchMedia";
 
 const DeleteMediaDialog = ({ open, onClose, onSubmit }) => {
   const translate = useTranslate();
@@ -311,18 +310,33 @@ export const QuarantineMediaButton = (props: ButtonProps) => {
   );
 };
 
-export const ViewMediaButton = ({ media_id, label }) => {
+export const ViewMediaButton = ({ mxcURL, uploadName, label }) => {
   const translate = useTranslate();
-  const url = getMediaUrl(media_id);
+  const forceDownload = (url: string, filename: string) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    console.log("a", a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleFile = async () => {
+    const response = await fetchAuthenticatedMedia(mxcURL, "original");
+    const blob = await response.blob();
+    const blobURL = URL.createObjectURL(blob);
+
+    forceDownload(blobURL, uploadName);
+    URL.revokeObjectURL(blobURL);
+  };
+
   return (
     <Box style={{ whiteSpace: "pre" }}>
       <Tooltip title={translate("resources.users_media.action.open")}>
         <span>
-          <Button
-            component={Link}
-            to={url}
-            target="_blank"
-            rel="noopener"
+        <Button
+            onClick={() => handleFile()}
             style={{ minWidth: 0, paddingLeft: 0, paddingRight: 0 }}
           >
             <FileOpenIcon />
@@ -335,24 +349,35 @@ export const ViewMediaButton = ({ media_id, label }) => {
 };
 
 export const MediaIDField = ({ source }) => {
-  const homeserver = storage.getItem("home_server");
   const record = useRecordContext();
-  if (!record) return null;
+  if (!record) {
+    return null;
+  }
+  const homeserver = storage.getItem("home_server");
 
-  const src = get(record, source)?.toString();
-  if (!src) return null;
+  const mediaID = get(record, source)?.toString();
+  if (!mediaID) {
+    return null;
+  }
 
-  return <ViewMediaButton media_id={`${homeserver}/${src}`} label={src} />;
+  const mxcURL = `mxc://${homeserver}/${mediaID}`;
+  const uploadName = decodeURIComponent(get(record, "upload_name")?.toString());
+
+  return <ViewMediaButton mxcURL={mxcURL} uploadName={uploadName} label={mediaID} />;
 };
 
-export const MXCField = ({ source }) => {
+export const ReportMediaContent = ({ source }) => {
   const record = useRecordContext();
-  if (!record) return null;
+  if (!record) {
+    return null;
+  }
 
-  const src = get(record, source)?.toString();
-  if (!src) return null;
+  const mxcURL = get(record, source)?.toString();
+  if (!mxcURL) {
+    return null;
+  }
 
-  const media_id = src.replace("mxc://", "");
+  const uploadName = decodeURIComponent(record.event_json.content.body);
 
-  return <ViewMediaButton media_id={media_id} label={src} />;
+  return <ViewMediaButton mxcURL={mxcURL} uploadName={uploadName} label={mxcURL} />;
 };

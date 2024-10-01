@@ -26,8 +26,10 @@ export const fetchAuthenticatedMedia = async (mxcUrl: string, type: MediaType): 
   let url = "";
   if (type === "thumbnail") {
     url = `${homeserver}/_matrix/client/v1/media/thumbnail/${serverName}/${mediaId}?width=24&height=24&method=scale`;
+  } else if (type === "original") {
+    url = `${homeserver}/_matrix/client/v1/media/download/${serverName}/${mediaId}`;
   } else {
-    // const url = `${homeserver}/_matrix/client/v1/media/download/${serverName}/${mediaId}`;
+    throw new Error("Invalid authenticated media type");
   }
 
   const response = await fetch(`${url}`, {
