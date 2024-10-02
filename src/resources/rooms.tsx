@@ -92,7 +92,6 @@ export const RoomShow = (props: ShowProps) => {
       <TabbedShowLayout>
         <Tab label="synapseadmin.rooms.tabs.basic" icon={<ViewListIcon />}>
           <AvatarField
-            type="thumbnail"
             source="avatar"
             sx={{ height: "120px", width: "120px" }}
             label="resources.rooms.fields.avatar"
