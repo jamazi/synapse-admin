@@ -394,6 +394,7 @@ export const ViewMediaButton = ({ mxcURL, uploadName, label }) => {
             <img src={blobURL} alt={uploadName}
               style={{ maxWidth: "100%", maxHeight: "/calc(100vh - 64px)", objectFit: "contain" }}
             />
+            <br />
             <ZoomInIcon />
           </Link>
         </DialogContent>
