@@ -326,7 +326,12 @@ export const UserEdit = (props: EditProps) => {
             label="resources.users.fields.avatar"
             accept={{ "image/*": [".png", ".jpg"] }}
           >
-            <ImageField source="src" title="Avatar" />
+            <ImageField source="src" title="Avatar" sx={{ '& img': {
+              width: "120px !important",
+              height: "120px !important",
+              objectFit: "cover !important",
+              borderRadius: '50% !important',
+            }}} />
           </ImageInput>
           <TextInput source="id" readOnly />
           <TextInput source="displayname" />
