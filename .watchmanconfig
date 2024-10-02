@@ -1,5 +1,5 @@
 {
     "ignore_dirs": [
-        "testdata/postgres.data"
+        "testdata"
     ]
 }
