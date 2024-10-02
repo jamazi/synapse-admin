@@ -1,10 +1,8 @@
 import { get } from "lodash";
-
 import { Avatar, AvatarProps } from "@mui/material";
 import { useRecordContext } from "react-admin";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { fetchAuthenticatedMedia } from "../utils/fetchMedia";
-import storage from "../storage";
 
 const AvatarField = ({ source, ...rest }: AvatarProps & { source: string, label?: string }) => {
   const { alt, classes, sizes, sx, variant } = rest;
@@ -12,27 +10,27 @@ const AvatarField = ({ source, ...rest }: AvatarProps & { source: string, label?
   const record = useRecordContext(rest);
   const mxcURL = get(record, source)?.toString();
 
-  const cacheKey = `thumbnail_${mxcURL}`;
-  const cachedAvatar = storage.getItem(cacheKey) || "";
-  const [src, setSrc] = useState<string>(cachedAvatar);
+  const [src, setSrc] = useState<string>("");
 
-  const fetchAvatar = async (mxcURL: string) => {
+  const fetchAvatar = useCallback(async (mxcURL: string) => {
     const response = await fetchAuthenticatedMedia(mxcURL, "thumbnail");
-
-    const contentType = response.headers.get("Content-Type");
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    const dataURL = `data:${contentType};base64,${base64}`;
-    setSrc(dataURL);
-    storage.setItem(cacheKey, dataURL);
-  };
+    const blob = await response.blob();
+    const blobURL = URL.createObjectURL(blob);
+    setSrc(blobURL);
+  }, []);
 
   useEffect(() => {
-    if (mxcURL &&!cachedAvatar) {
+    if (mxcURL) {
       fetchAvatar(mxcURL);
     }
 
-  }, [mxcURL, cachedAvatar]);
+    // Cleanup function to revoke the object URL
+    return () => {
+      if (src) {
+        URL.revokeObjectURL(src);
+      }
+    };
+  }, [mxcURL, fetchAvatar]);
 
   return <Avatar alt={alt} classes={classes} sizes={sizes} src={src} sx={sx} variant={variant} />;
 };
