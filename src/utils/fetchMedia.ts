@@ -25,7 +25,8 @@ export const fetchAuthenticatedMedia = async (mxcUrl: string, type: MediaType): 
 
   let url = "";
   if (type === "thumbnail") {
-    url = `${homeserver}/_matrix/client/v1/media/thumbnail/${serverName}/${mediaId}?width=24&height=24&method=scale`;
+    // ref: https://spec.matrix.org/latest/client-server-api/#thumbnails
+    url = `${homeserver}/_matrix/client/v1/media/thumbnail/${serverName}/${mediaId}?width=96&height=96&method=crop`;
   } else if (type === "original") {
     url = `${homeserver}/_matrix/client/v1/media/download/${serverName}/${mediaId}`;
   } else {
