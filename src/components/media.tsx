@@ -1,6 +1,7 @@
 import { get } from "lodash";
 import { useState } from "react";
 
+import Typography from "@mui/material/Typography";
 import BlockIcon from "@mui/icons-material/Block";
 import IconCancel from "@mui/icons-material/Cancel";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -8,7 +9,10 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import { Box, Dialog, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import { Box, Dialog, DialogContent, DialogContentText, DialogTitle, Tooltip, Link } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import {
   BooleanInput,
@@ -312,6 +316,18 @@ export const QuarantineMediaButton = (props: ButtonProps) => {
 
 export const ViewMediaButton = ({ mxcURL, uploadName, label }) => {
   const translate = useTranslate();
+
+  const [open, setOpen] = useState(false);
+  const [blobURL, setBlobURL] = useState("");
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    if (blobURL) {
+      URL.revokeObjectURL(blobURL);
+    }
+  };
+
   const forceDownload = (url: string, filename: string) => {
     const anchorElement = document.createElement("a");
     anchorElement.href = url;
@@ -319,31 +335,70 @@ export const ViewMediaButton = ({ mxcURL, uploadName, label }) => {
     document.body.appendChild(anchorElement);
     anchorElement.click();
     document.body.removeChild(anchorElement);
+    URL.revokeObjectURL(blobURL);
   };
 
   const handleFile = async () => {
     const response = await fetchAuthenticatedMedia(mxcURL, "original");
     const blob = await response.blob();
     const blobURL = URL.createObjectURL(blob);
+    setBlobURL(blobURL);
 
-    forceDownload(blobURL, uploadName);
-    URL.revokeObjectURL(blobURL);
+    const mimeType = blob.type;
+    if (!mimeType.startsWith("image/")) {
+      forceDownload(blobURL, uploadName);
+    } else {
+      handleOpen();
+    }
   };
 
   return (
-    <Box style={{ whiteSpace: "pre" }}>
-      <Tooltip title={translate("resources.users_media.action.open")}>
-        <span>
-        <Button
-            onClick={() => handleFile()}
-            style={{ minWidth: 0, paddingLeft: 0, paddingRight: 0 }}
+    <>
+      <Box style={{ whiteSpace: "pre" }}>
+        <Tooltip title={translate("resources.users_media.action.open")}>
+          <span>
+          <Button
+              onClick={() => handleFile()}
+              style={{ minWidth: 0, paddingLeft: 0, paddingRight: 0 }}
+            >
+              <FileOpenIcon />
+            </Button>
+          </span>
+        </Tooltip>
+        {label}
+      </Box>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="image-modal-title"
+        aria-describedby="image-modal-description"
+        style={{ maxWidth: "100%", maxHeight: "100%" }}
+      >
+        <DialogTitle id="image-modal-title">
+          <Typography>{uploadName}</Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: theme.palette.grey[500],
+            })}
           >
-            <FileOpenIcon />
-          </Button>
-        </span>
-      </Tooltip>
-      {label}
-    </Box>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Link href={blobURL} target="_blank">
+            <img src={blobURL} alt={uploadName}
+              style={{ maxWidth: "100%", maxHeight: "/calc(100vh - 64px)", objectFit: "contain" }}
+            />
+            <ZoomInIcon />
+          </Link>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
