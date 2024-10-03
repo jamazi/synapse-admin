@@ -9,6 +9,7 @@ import FileOpenIcon from "@mui/icons-material/FileOpen";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DownloadIcon from '@mui/icons-material/Download';
+import DownloadingIcon from '@mui/icons-material/Downloading';
 import { Grid2 as Grid, Box, Dialog, DialogContent, DialogContentText, DialogTitle, Tooltip, Link } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import {
@@ -313,6 +314,7 @@ export const QuarantineMediaButton = (props: ButtonProps) => {
 
 export const ViewMediaButton = ({ mxcURL, label, uploadName, mimetype }) => {
   const translate = useTranslate();
+  const [loading, setLoading] = useState(false);
   const isImage = mimetype && mimetype.startsWith("image/");
 
   const openFileInNewTab = (blobURL: string) => {
@@ -337,6 +339,7 @@ export const ViewMediaButton = ({ mxcURL, label, uploadName, mimetype }) => {
   };
 
   const handleFile = async (preview: boolean) => {
+    setLoading(true);
     const response = await fetchAuthenticatedMedia(mxcURL, "original");
     const blob = await response.blob();
     const blobURL = URL.createObjectURL(blob);
@@ -345,6 +348,7 @@ export const ViewMediaButton = ({ mxcURL, label, uploadName, mimetype }) => {
     } else {
       downloadFile(blobURL);
     }
+    setLoading(false);
   };
 
   return (
@@ -354,19 +358,21 @@ export const ViewMediaButton = ({ mxcURL, label, uploadName, mimetype }) => {
           <span>
             {isImage && (
               <Button
+                disabled={loading}
                 onClick={() => handleFile(true)}
                 style={{ minWidth: 0, padding: 0, marginRight: 8 }}
               >
-                <FileOpenIcon />
+                {loading ? <DownloadingIcon /> : <FileOpenIcon />}
               </Button>
             )}
           </span>
         </Tooltip>
         <Button
+          disabled={loading}
           onClick={() => handleFile(false)}
           style={{ minWidth: 0, padding: 0, marginRight: 8 }}
         >
-          <DownloadIcon />
+        {loading ? <DownloadingIcon /> : <DownloadIcon />}
         </Button>
         <span>{label}</span>
       </Box>
