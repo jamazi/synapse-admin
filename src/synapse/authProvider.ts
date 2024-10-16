@@ -117,6 +117,7 @@ const authProvider: AuthProvider = {
         console.log("Error logging out", err);
       } finally {
         storage.removeItem("access_token");
+        storage.removeItem("login_type");
       }
     }
   },

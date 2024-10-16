@@ -28,7 +28,7 @@ import {
 } from "../synapse/synapse";
 import storage from "../storage";
 
-type LoginMethod = "credentials" | "accessToken";
+export type LoginMethod = "credentials" | "accessToken";
 
 const LoginPage = () => {
   const login = useLogin();
