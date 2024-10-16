@@ -14,6 +14,8 @@ const en: SynapseTranslationMessages = {
       protocol_error: "URL has to start with 'http://' or 'https://'",
       url_error: "Not a valid Matrix server URL",
       sso_sign_in: "Sign in with SSO",
+      credentials: "Credentials",
+      access_token: "Access token",
     },
     users: {
       invalid_user_id: "Localpart of a Matrix user-id without homeserver.",
