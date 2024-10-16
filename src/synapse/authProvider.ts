@@ -60,6 +60,13 @@ const authProvider: AuthProvider = {
     let response;
     try {
       response = await fetchUtils.fetchJson(login_api_url, options);
+      const json = response.json;
+      storage.setItem("home_server", json.home_server);
+      storage.setItem("user_id", json.user_id);
+      storage.setItem("access_token", json.access_token);
+      storage.setItem("device_id", json.device_id);
+
+      return Promise.resolve({redirectTo: "/"});
     } catch(err) {
       const error = err as HttpError;
       const errorStatus = error.status;
@@ -71,14 +78,8 @@ const authProvider: AuthProvider = {
           errMsg,
           errorStatus,
         )
-    );
+      );
     }
-
-    const json = response.json;
-    storage.setItem("home_server", json.home_server);
-    storage.setItem("user_id", json.user_id);
-    storage.setItem("access_token", json.access_token);
-    storage.setItem("device_id", json.device_id);
   },
   // called when the user clicks on the logout button
   logout: async () => {
