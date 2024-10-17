@@ -13,7 +13,7 @@ const supportLink = (): string => {
   }
 };
 
-const CustomUserMenu = () => {
+const AdminUserMenu = () => {
   const [open, setOpen] = useState(false);
   const logout = useLogout();
   const checkLoginType = (ev: React.MouseEvent<HTMLDivElement>) => {
@@ -43,18 +43,18 @@ const CustomUserMenu = () => {
       </div>
       <Confirm
         isOpen={open}
-        title={`You are using an access token to login.`}
-        content="Do you want to destroy this session completely or just logout from the admin panel?"
+        title="synapseadmin.auth.logout_acces_token_dialog.title"
+        content="synapseadmin.auth.logout_acces_token_dialog.content"
         onConfirm={handleConfirm}
         onClose={handleDialogClose}
-        confirm="Destroy session"
-        cancel="Logout from admin panel"
+        confirm="synapseadmin.auth.logout_acces_token_dialog.confirm"
+        cancel="synapseadmin.auth.logout_acces_token_dialog.cancel"
       />
     </UserMenu>
   );
 };
 
-const CustomAppBar = () => <AppBar userMenu={<CustomUserMenu />} />;
+const AdminAppBar = () => <AppBar userMenu={<AdminUserMenu />} />;
 
 const AdminMenu = () => (
   <Menu>
@@ -64,7 +64,7 @@ const AdminMenu = () => (
 );
 
 export const AdminLayout = ({ children }) => (
-  <Layout appBar={CustomAppBar} menu={AdminMenu}>
+  <Layout appBar={AdminAppBar} menu={AdminMenu}>
     {children}
   </Layout>
 );

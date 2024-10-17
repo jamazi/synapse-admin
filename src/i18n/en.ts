@@ -16,6 +16,12 @@ const en: SynapseTranslationMessages = {
       sso_sign_in: "Sign in with SSO",
       credentials: "Credentials",
       access_token: "Access token",
+      logout_acces_token_dialog: {
+        title: "You are using an existing Matrix access token.",
+        content: "Do you want to destroy this session (that could be used elsewhere, e.g. in a Matrix client) or just logout from the admin panel?",
+        confirm: "Destroy session",
+        cancel: "Just logout from admin panel",
+      },
     },
     users: {
       invalid_user_id: "Localpart of a Matrix user-id without homeserver.",
